@@ -1,9 +1,7 @@
 package com.falesdev.blog.mappers;
 
 import com.falesdev.blog.domain.PostStatus;
-import com.falesdev.blog.domain.dtos.requests.CreateCategoryRequest;
 import com.falesdev.blog.domain.dtos.TagDto;
-import com.falesdev.blog.domain.dtos.requests.CreateTagRequest;
 import com.falesdev.blog.domain.entities.Post;
 import com.falesdev.blog.domain.entities.Tag;
 import org.mapstruct.Mapper;
@@ -11,7 +9,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
 import java.util.Set;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)

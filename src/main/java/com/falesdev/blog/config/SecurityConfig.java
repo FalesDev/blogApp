@@ -26,27 +26,9 @@ public class SecurityConfig {
         return new JwtAuthenticationFilter(authenticationService);
     }
 
-    /*//Con esto deberia funcionar al momento de crear el user endpoint
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository){
         return new BlogUserDetailsService(userRepository);
-    }*/
-
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository){
-        BlogUserDetailsService blogUserDetailsService = new BlogUserDetailsService(userRepository);
-
-        String email= "user@test.com";
-        userRepository.findByEmail(email).orElseGet(()->{
-            User newUser = User.builder()
-                    .name("Test User")
-                    .email(email)
-                    .password(passwordEncoder().encode("password"))
-                    .build();
-            return userRepository.save(newUser);
-        });
-
-        return blogUserDetailsService;
     }
 
     @Bean
@@ -54,13 +36,21 @@ public class SecurityConfig {
             HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.authorizeHttpRequests(auth ->auth
                     .requestMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll()
+                    .requestMatchers(HttpMethod.GET,"/api/v1/auth/me").authenticated()
                     .requestMatchers(HttpMethod.GET,"/api/v1/posts/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/v1/posts").authenticated()
-                    .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").authenticated()
-                    .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/**").authenticated()
-                    .requestMatchers(HttpMethod.GET,"/api/v1/posts/drafts").authenticated()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/posts").hasAnyRole("ADMIN","USER")
+                    .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").hasAnyRole("ADMIN","USER")
+                    .requestMatchers(HttpMethod.DELETE, "/api/v1/posts/**").hasAnyRole("ADMIN","USER")
+                    .requestMatchers(HttpMethod.GET,"/api/v1/posts/drafts").hasAnyRole("ADMIN","USER")
                     .requestMatchers(HttpMethod.GET,"/api/v1/categories/**").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/api/v1/categories/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT,"/api/v1/categories/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE,"/api/v1/categories/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET,"/api/v1/tags/**").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/api/v1/tags/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE,"/api/v1/tags/**").hasRole("ADMIN")
+                    .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
                 )
                 .csrf(csrf ->csrf.disable())

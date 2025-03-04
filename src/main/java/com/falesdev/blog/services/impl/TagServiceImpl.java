@@ -1,7 +1,8 @@
 package com.falesdev.blog.services.impl;
 
-import com.falesdev.blog.domain.entities.Category;
+import com.falesdev.blog.domain.dtos.TagDto;
 import com.falesdev.blog.domain.entities.Tag;
+import com.falesdev.blog.mappers.TagMapper;
 import com.falesdev.blog.respositories.TagRepository;
 import com.falesdev.blog.services.TagService;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,15 +18,19 @@ import java.util.stream.Collectors;
 public class TagServiceImpl implements TagService {
 
     private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
 
     @Override
-    public List<Tag> listTags() {
-        return tagRepository.findAllWithPostCount();
+    public List<TagDto> listTags() {
+        return tagRepository.findAllWithPostCount().stream()
+                .map(tagMapper::toDto)
+                .toList();
     }
 
-    @Transactional
+
     @Override
-    public List<Tag> createTags(Set<String> tagNames) {
+    @Transactional
+    public List<TagDto> createTags(Set<String> tagNames) {
         List<Tag> existingTags = tagRepository.findByNameIn(tagNames);
 
         Set<String> existingTagNames = existingTags.stream()
@@ -46,8 +51,7 @@ public class TagServiceImpl implements TagService {
         }
 
         savedTags.addAll(existingTags);
-
-        return savedTags;
+        return savedTags.stream().map(tagMapper::toDto).toList();
     }
 
     @Override

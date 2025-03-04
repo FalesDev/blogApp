@@ -1,22 +1,31 @@
 package com.falesdev.blog.services.impl;
 
+import com.falesdev.blog.domain.dtos.AuthResponse;
+import com.falesdev.blog.domain.dtos.requests.SignupRequest;
+import com.falesdev.blog.domain.entities.Role;
+import com.falesdev.blog.domain.entities.User;
+import com.falesdev.blog.exceptions.EmailAlreadyExistsException;
+import com.falesdev.blog.respositories.RoleRepository;
+import com.falesdev.blog.respositories.UserRepository;
 import com.falesdev.blog.services.AuthenticationService;
+import com.falesdev.blog.services.JwtService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,49 +33,74 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
-
-    @Value("${jwt.secret}")
-    private String secretKey;
-
-    private final Long jwtExpiryMs = 86400000L;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDetails authenticate(String email, String password) {
+    public AuthResponse authenticate(String email, String password) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email,password)
         );
-        return userDetailsService.loadUserByUsername(email);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+        String token = generateToken(userDetails);
+        long expiresIn = jwtService.getExpirationTime(token);
+
+        return AuthResponse.builder()
+                .token(token)
+                .expiresIn(expiresIn)
+                .build();
     }
 
     @Override
+    public AuthResponse register(SignupRequest signupRequest) {
+        if (userRepository.existsByEmailIgnoreCase(signupRequest.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already in use");
+        }
+
+        Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new EntityNotFoundException("Role USER not found"));
+
+        User newUser = User.builder()
+                .name(signupRequest.getName())
+                .email(signupRequest.getEmail())
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
+                .roles(new HashSet<>())
+                .build();
+
+        newUser.getRoles().add(userRole);
+        userRepository.save(newUser);
+
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(newUser.getEmail());
+        String token = jwtService.generateToken(userDetails);
+        long expiresIn = jwtService.getExpirationTime(token);
+
+        return AuthResponse.builder()
+                .token(token)
+                .expiresIn(expiresIn)
+                .build();
+    }
+
+
+    @Override
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiryMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+        return jwtService.generateToken(userDetails);
     }
 
     @Override
     public UserDetails validateToken(String token) {
-        String username = extractUsername(token);
-        return userDetailsService.loadUserByUsername(username);
-    }
+        try {
+            final Claims claims = jwtService.parseClaims(token);
+            final String username = claims.getSubject();
 
-    private String extractUsername(String token){
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
-    }
-
-    private Key getSigningKey(){
-        byte[] keyBytes = secretKey.getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
+            return userDetailsService.loadUserByUsername(username);
+        } catch (ExpiredJwtException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expirado", ex);
+        } catch (JwtException | UsernameNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Error de autenticación", ex);
+        }
     }
 }

@@ -1,9 +1,8 @@
 package com.falesdev.blog.controllers;
 
 import com.falesdev.blog.domain.dtos.CategoryDto;
-import com.falesdev.blog.domain.dtos.requests.CreateCategoryRequest;
-import com.falesdev.blog.domain.entities.Category;
-import com.falesdev.blog.mappers.CategoryMapper;
+import com.falesdev.blog.domain.dtos.requests.CreateCategoryRequestDto;
+import com.falesdev.blog.domain.dtos.requests.UpdateCategoryRequestDto;
 import com.falesdev.blog.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +19,30 @@ import java.util.UUID;
 public class CategoryController {
 
     private final CategoryService categoryService;
-    private final CategoryMapper categoryMapper;
 
     @GetMapping
     public ResponseEntity<List<CategoryDto>> listCategories(){
-        List<CategoryDto> categories = categoryService.listCategories()
-                .stream().map(categoryMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.listCategories());
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable UUID id){
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
     @PostMapping
     public ResponseEntity<CategoryDto> createCategory(
-            @Valid @RequestBody CreateCategoryRequest createCategoryRequest){
-        Category categoryToCreate = categoryMapper.toEntity(createCategoryRequest);
-        Category savedCategory = categoryService.createCategory(categoryToCreate);
+            @Valid @RequestBody CreateCategoryRequestDto createCategoryRequestDto){
         return new ResponseEntity<>(
-                categoryMapper.toDto(savedCategory),
+                categoryService.createCategory(createCategoryRequestDto),
                 HttpStatus.CREATED
         );
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<CategoryDto> updateCategory (
+            @PathVariable UUID id, @Valid @RequestBody UpdateCategoryRequestDto updateCategoryRequestDto){
+        return ResponseEntity.ok(categoryService.updateCategory(id,updateCategoryRequestDto));
     }
 
     @DeleteMapping(path = "/{id}")

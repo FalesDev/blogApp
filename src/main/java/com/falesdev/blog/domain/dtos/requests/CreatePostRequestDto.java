@@ -30,8 +30,9 @@ public class CreatePostRequestDto {
     @NotNull(message = "Category ID is required")
     private UUID categoryId;
 
-    @Builder.Default
+    @NotNull(message = "Tags cannot be null")
     @Size(max = 10, message = "Maximum {max} tags allowed")
+    @Builder.Default
     private Set<UUID> tagIds = new HashSet<>();
 
     @NotNull(message = "Status is required")

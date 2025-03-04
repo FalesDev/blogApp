@@ -1,10 +1,7 @@
 package com.falesdev.blog.controllers;
 
-import com.falesdev.blog.domain.dtos.CategoryDto;
 import com.falesdev.blog.domain.dtos.TagDto;
-import com.falesdev.blog.domain.dtos.requests.CreateCategoryRequest;
-import com.falesdev.blog.domain.dtos.requests.CreateTagRequest;
-import com.falesdev.blog.domain.entities.Category;
+import com.falesdev.blog.domain.dtos.requests.CreateTagRequestDto;
 import com.falesdev.blog.domain.entities.Tag;
 import com.falesdev.blog.mappers.TagMapper;
 import com.falesdev.blog.services.TagService;
@@ -27,19 +24,14 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<List<TagDto>> listTags(){
-        List<TagDto> tags = tagService.listTags()
-                .stream().map(tagMapper::toDto)
-                .toList();
-        return ResponseEntity.ok(tags);
+        return ResponseEntity.ok(tagService.listTags());
     }
 
     @PostMapping
     public ResponseEntity<List<TagDto>> createTags(
-            @Valid @RequestBody CreateTagRequest createTagRequest){
-        List<Tag> savedTag = tagService.createTags(createTagRequest.getNames());
-        List<TagDto> createdTagDtos = savedTag.stream().map(tagMapper::toDto).toList();
+            @Valid @RequestBody CreateTagRequestDto createTagRequestDto){
         return new ResponseEntity<>(
-                createdTagDtos,
+                tagService.createTags(createTagRequestDto.getNames()),
                 HttpStatus.CREATED
         );
     }

@@ -39,5 +39,4 @@ public class UpdatePostRequestDto {
 
     @NotNull(message = "Status is required")
     private PostStatus status;
-
 }

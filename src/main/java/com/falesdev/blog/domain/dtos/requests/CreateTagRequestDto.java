@@ -14,12 +14,12 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateTagRequest {
+public class CreateTagRequestDto {
 
     @NotEmpty(message = "At least one tag name is required")
     @Size(max = 10, message = "Maximum {max} tags allowed")
     private Set<
-            @Size(min = 2, max = 30, message = "Category name must be between {min} and {max} characters")
+            @Size(min = 2, max = 30, message = "Tag name must be between {min} and {max} characters")
             @Pattern(regexp = "^[\\w\\s-]+$", message = "Tag name can only contain letters, numbers, spaces and hyphens")
             String> names;
 }
