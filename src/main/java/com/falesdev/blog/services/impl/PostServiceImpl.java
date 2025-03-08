@@ -16,6 +16,8 @@ import com.falesdev.blog.services.PostService;
 import com.falesdev.blog.services.TagService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,52 +48,52 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDto> getAllPosts(UUID categoryId, UUID tagId) {
+    public Page<PostDto> getAllPosts(UUID categoryId, UUID tagId, Pageable pageable) {
         if(categoryId != null && tagId != null) {
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new EntityNotFoundException("Category not found"));
             Tag tag = tagService.getTagById(tagId);
-            List<Post> posts = postRepository.findAllByStatusAndCategoryAndTagsContaining(
+            return postRepository.findAllByStatusAndCategoryAndTag(
                     PostStatus.PUBLISHED,
                     category,
-                    tag
-            );
-
-            return posts.stream().map(postMapper::toDto).toList();
+                    tag,
+                    pageable
+            ).map(postMapper::toDto);
         }
 
         if(categoryId != null) {
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-            List<Post> posts = postRepository.findAllByStatusAndCategory(
+            return postRepository.findAllByStatusAndCategory(
                     PostStatus.PUBLISHED,
-                    category
-            );
-
-            return posts.stream().map(postMapper::toDto).toList();
+                    category,
+                    pageable
+            ).map(postMapper::toDto);
         }
 
         if(tagId != null) {
             Tag tag = tagService.getTagById(tagId);
-            List<Post> posts = postRepository.findAllByStatusAndTagsContaining(
+            return postRepository.findAllByStatusAndTag(
                     PostStatus.PUBLISHED,
-                    tag
-            );
-
-            return posts.stream().map(postMapper::toDto).toList();
+                    tag,
+                    pageable
+            ).map(postMapper::toDto);
         }
 
-        List<Post> posts = postRepository.findAllByStatus(PostStatus.PUBLISHED);
-        return posts.stream().map(postMapper::toDto).toList();
+        return postRepository.findAllByStatus(PostStatus.PUBLISHED, pageable)
+                .map(postMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PostDto> getDraftPosts(UUID userId) {
+    public Page<PostDto> getDraftPosts(UUID userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        List<Post> postAuthorDraft = postRepository.findAllByAuthorAndStatus(user, PostStatus.DRAFT);
-        return postAuthorDraft.stream().map(postMapper::toDto).toList();
+        return postRepository.findAllByAuthorAndStatus(
+                user,
+                PostStatus.DRAFT,
+                pageable
+        ).map(postMapper::toDto);
     }
 
     @Override

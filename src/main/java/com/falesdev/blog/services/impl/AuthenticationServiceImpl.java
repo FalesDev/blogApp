@@ -1,12 +1,15 @@
 package com.falesdev.blog.services.impl;
 
 import com.falesdev.blog.domain.dtos.AuthResponse;
+import com.falesdev.blog.domain.dtos.AuthUser;
+import com.falesdev.blog.domain.dtos.RoleDto;
 import com.falesdev.blog.domain.dtos.requests.SignupRequest;
 import com.falesdev.blog.domain.entities.Role;
 import com.falesdev.blog.domain.entities.User;
 import com.falesdev.blog.exceptions.EmailAlreadyExistsException;
 import com.falesdev.blog.respositories.RoleRepository;
 import com.falesdev.blog.respositories.UserRepository;
+import com.falesdev.blog.security.BlogUserDetails;
 import com.falesdev.blog.services.AuthenticationService;
 import com.falesdev.blog.services.JwtService;
 import io.jsonwebtoken.Claims;
@@ -17,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -73,7 +79,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         newUser.getRoles().add(userRole);
         userRepository.save(newUser);
 
-
         UserDetails userDetails = userDetailsService.loadUserByUsername(newUser.getEmail());
         String token = jwtService.generateToken(userDetails);
         long expiresIn = jwtService.getExpirationTime(token);
@@ -98,9 +103,25 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             return userDetailsService.loadUserByUsername(username);
         } catch (ExpiredJwtException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expirado", ex);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token expired", ex);
         } catch (JwtException | UsernameNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Error de autenticación", ex);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication error", ex);
         }
+    }
+
+    @Override
+    public AuthUser getUserProfile(Authentication authentication) {
+        BlogUserDetails userDetails = (BlogUserDetails) authentication.getPrincipal();
+
+        Set<RoleDto> roles = userDetails.getUser().getRoles().stream()
+                .map(role -> new RoleDto(role.getId(), role.getName()))
+                .collect(Collectors.toSet());
+
+        return new AuthUser(
+                userDetails.getId(),
+                userDetails.getUser().getName(),
+                userDetails.getUsername(),
+                roles
+        );
     }
 }

@@ -2,8 +2,6 @@ package com.falesdev.blog.controllers;
 
 import com.falesdev.blog.domain.dtos.TagDto;
 import com.falesdev.blog.domain.dtos.requests.CreateTagRequestDto;
-import com.falesdev.blog.domain.entities.Tag;
-import com.falesdev.blog.mappers.TagMapper;
 import com.falesdev.blog.services.TagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,6 @@ import java.util.UUID;
 public class TagController {
 
     private final TagService tagService;
-    private final TagMapper tagMapper;
 
     @GetMapping
     public ResponseEntity<List<TagDto>> listTags(){

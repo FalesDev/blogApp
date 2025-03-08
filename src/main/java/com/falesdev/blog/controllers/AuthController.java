@@ -4,15 +4,13 @@ import com.falesdev.blog.domain.dtos.AuthResponse;
 import com.falesdev.blog.domain.dtos.AuthUser;
 import com.falesdev.blog.domain.dtos.requests.LoginRequest;
 import com.falesdev.blog.domain.dtos.requests.SignupRequest;
-import com.falesdev.blog.domain.entities.User;
-import com.falesdev.blog.security.BlogUserDetails;
 import com.falesdev.blog.services.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping(path = "/api/v1/auth")
@@ -31,13 +29,7 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<AuthUser> getUserProfile(Authentication authentication) {
-        BlogUserDetails userDetails = (BlogUserDetails) authentication.getPrincipal();
-        AuthUser response = new AuthUser(
-                userDetails.getId(),
-                userDetails.getUser().getName(),
-                userDetails.getUsername()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authenticationService.getUserProfile(authentication));
     }
 
     @PostMapping("/signup")

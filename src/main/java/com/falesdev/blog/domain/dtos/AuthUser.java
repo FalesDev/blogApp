@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -16,4 +17,5 @@ public class AuthUser {
     private UUID id;
     private String name;
     private String email;
+    private Set<RoleDto> roles;
 }

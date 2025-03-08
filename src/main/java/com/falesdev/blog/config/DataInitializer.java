@@ -43,7 +43,7 @@ public class DataInitializer {
     private Role createRoleIfNotFound(String name) {
         return roleRepository.findByName(name)
                 .orElseGet(() -> {
-                    log.info("Creando rol: {}", name);
+                    log.info("Creating rol: {}", name);
                     return roleRepository.save(
                             Role.builder()
                                     .name(name)
@@ -55,7 +55,7 @@ public class DataInitializer {
     private void createUserIfNotFound(String email, String name,
                                       String rawPassword, Set<Role> roles) {
         userRepository.findByEmail(email).orElseGet(() -> {
-            log.info("Creando usuario: {}", email);
+            log.info("Creating user: {}", email);
             return userRepository.save(
                     User.builder()
                             .email(email)

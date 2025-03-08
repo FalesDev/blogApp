@@ -6,6 +6,10 @@ import com.falesdev.blog.domain.dtos.requests.UpdatePostRequestDto;
 import com.falesdev.blog.services.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +25,25 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts(
+    public ResponseEntity<Page<PostDto>> getAllPosts(
             @RequestParam(required = false) UUID categoryId,
-            @RequestParam(required = false) UUID tagId) {
-        return ResponseEntity.ok(postService.getAllPosts(categoryId, tagId));
+            @RequestParam(required = false) UUID tagId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(postService.getAllPosts(categoryId, tagId,pageable));
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<PostDto> getPost(
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(postService.getPost(id));
     }
 
     @GetMapping(path = "/drafts")
-    public ResponseEntity<List<PostDto>> getDrafts(@RequestAttribute UUID userId) {
-        return ResponseEntity.ok(postService.getDraftPosts(userId));
+    public ResponseEntity<Page<PostDto>> getDrafts(
+            @RequestAttribute UUID userId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(postService.getDraftPosts(userId,pageable));
     }
 
     @PostMapping
@@ -44,13 +58,6 @@ public class PostController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto) {
         return ResponseEntity.ok(postService.updatePost(id, updatePostRequestDto));
-    }
-
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<PostDto> getPost(
-            @PathVariable UUID id
-    ) {
-        return ResponseEntity.ok(postService.getPost(id));
     }
 
     @DeleteMapping(path = "/{id}")

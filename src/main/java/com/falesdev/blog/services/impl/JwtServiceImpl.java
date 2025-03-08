@@ -45,7 +45,7 @@ public class JwtServiceImpl implements JwtService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (SignatureException e) {
-            throw new JwtException("Firma JWT inválida", e);
+            throw new JwtException("Invalid JWT signature", e);
         }
     }
 

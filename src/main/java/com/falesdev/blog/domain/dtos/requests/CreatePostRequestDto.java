@@ -20,11 +20,11 @@ import java.util.UUID;
 public class CreatePostRequestDto {
 
     @NotBlank(message = "Title is required")
-    @Size(min = 3, max = 200, message = "Title must be between {min} and {max} characters")
+    @Size(min = 1, max = 200, message = "Title must be between {min} and {max} characters")
     private String title;
 
     @NotBlank(message = "Content is required")
-    @Size(min = 10, max = 50000, message = "Content must be between {min} and {max} characters")
+    @Size(min = 1, max = 50000, message = "Content must be between {min} and {max} characters")
     private String content;
 
     @NotNull(message = "Category ID is required")
