@@ -1,7 +1,6 @@
 package com.falesdev.blog.security;
 
-import com.falesdev.blog.config.SecurityConfig;
-import com.falesdev.blog.services.AuthenticationService;
+import com.falesdev.blog.service.AuthenticationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception ex){
-            // Do not throw exceptions, just don't authenticate the user
             log.warn("Received invalid auth token");
         }
 

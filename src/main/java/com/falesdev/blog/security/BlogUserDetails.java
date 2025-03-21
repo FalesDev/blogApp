@@ -1,6 +1,6 @@
 package com.falesdev.blog.security;
 
-import com.falesdev.blog.domain.entities.User;
+import com.falesdev.blog.domain.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

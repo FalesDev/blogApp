@@ -1,9 +1,9 @@
 package com.falesdev.blog.config;
 
-import com.falesdev.blog.domain.entities.Role;
-import com.falesdev.blog.domain.entities.User;
-import com.falesdev.blog.respositories.RoleRepository;
-import com.falesdev.blog.respositories.UserRepository;
+import com.falesdev.blog.domain.entity.Role;
+import com.falesdev.blog.domain.entity.User;
+import com.falesdev.blog.repository.RoleRepository;
+import com.falesdev.blog.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

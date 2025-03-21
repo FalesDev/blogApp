@@ -1,13 +1,16 @@
 package com.falesdev.blog.config;
 
-import com.falesdev.blog.domain.entities.User;
-import com.falesdev.blog.respositories.UserRepository;
+import com.falesdev.blog.domain.dto.ApiErrorResponse;
+import com.falesdev.blog.repository.UserRepository;
 import com.falesdev.blog.security.BlogUserDetailsService;
 import com.falesdev.blog.security.JwtAuthenticationFilter;
-import com.falesdev.blog.services.AuthenticationService;
+import com.falesdev.blog.service.AuthenticationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +18,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -57,8 +62,41 @@ public class SecurityConfig {
                 .csrf(csrf ->csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .accessDeniedHandler(accessDeniedHandler())
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                );
         return http.build();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, ex) -> {
+            ApiErrorResponse error = ApiErrorResponse.builder()
+                    .status(HttpStatus.FORBIDDEN.value())
+                    .message("You don't have permission to access this resource")
+                    .build();
+
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getWriter(), error);
+        };
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            ApiErrorResponse error = ApiErrorResponse.builder()
+                    .status(HttpStatus.UNAUTHORIZED.value())
+                    .message("Authentication failed: Invalid authentication token")
+                    .build();
+
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            new ObjectMapper().writeValue(response.getWriter(), error);
+        };
     }
 
     @Bean
