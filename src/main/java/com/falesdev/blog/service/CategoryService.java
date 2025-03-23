@@ -1,6 +1,5 @@
 package com.falesdev.blog.service;
 
-
 import com.falesdev.blog.domain.dto.CategoryDto;
 import com.falesdev.blog.domain.dto.request.CreateCategoryRequestDto;
 import com.falesdev.blog.domain.dto.request.UpdateCategoryRequestDto;

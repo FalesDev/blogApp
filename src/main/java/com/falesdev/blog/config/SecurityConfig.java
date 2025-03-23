@@ -40,9 +40,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http.authorizeHttpRequests(auth ->auth
+                    // Endpoints de Swagger
+                    .requestMatchers(
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/swagger-resources/**",
+                            "/webjars/**",
+                            "/swagger-ui.html",
+                            "/swagger-ui/index.html"
+                    ).permitAll()
+
+                    // Endpoints de autenticación
                     .requestMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll()
                     .requestMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll()
                     .requestMatchers(HttpMethod.GET,"/api/v1/auth/me").authenticated()
+
+                    // Endpoints de posts,categories,tags,roles,users
                     .requestMatchers(HttpMethod.GET,"/api/v1/posts/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/v1/posts").hasAnyRole("ADMIN","USER")
                     .requestMatchers(HttpMethod.PUT, "/api/v1/posts/**").hasAnyRole("ADMIN","USER")

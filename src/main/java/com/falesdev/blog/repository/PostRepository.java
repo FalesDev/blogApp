@@ -17,7 +17,6 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends JpaRepository<Post, UUID> {
 
-    // Solo tag
     @Query("SELECT p FROM Post p JOIN p.tags t WHERE p.status = :status AND t = :tag")
     Page<Post> findAllByStatusAndTag(
             @Param("status") PostStatus status,
