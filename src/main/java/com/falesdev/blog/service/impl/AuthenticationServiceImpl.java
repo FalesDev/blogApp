@@ -11,6 +11,7 @@ import com.falesdev.blog.repository.RoleRepository;
 import com.falesdev.blog.repository.UserRepository;
 import com.falesdev.blog.security.BlogUserDetails;
 import com.falesdev.blog.service.AuthenticationService;
+import com.falesdev.blog.service.EmailService;
 import com.falesdev.blog.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -43,6 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Override
     public AuthResponse authenticate(String email, String password) {
@@ -78,6 +80,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         newUser.getRoles().add(userRole);
         userRepository.save(newUser);
+
+        emailService.sendWelcomeEmail(newUser.getEmail(), newUser.getName());
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(newUser.getEmail());
         String token = jwtService.generateToken(userDetails);

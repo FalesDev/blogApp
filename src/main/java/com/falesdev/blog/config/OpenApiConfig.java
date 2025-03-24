@@ -19,7 +19,7 @@ import org.springframework.http.HttpHeaders;
                         name = "Stefano Fabricio Rodriguez Avalos",
                         email = "fabriciorodriguezavalos043@gmail.com"
                 ),
-                version = "1.0.6",
+                version = "1.0.7",
                 license = @License(
                         name = "Standard Software Use License for FalesDev"
                 )
