@@ -57,6 +57,9 @@ public class AuthenticationServiceImplUnitTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private EmailService emailService;
+
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
@@ -95,20 +98,33 @@ public class AuthenticationServiceImplUnitTest {
 
         when(userRepository.existsByEmailIgnoreCase(testEmail)).thenReturn(false);
         when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
-        when(passwordEncoder.encode(eq(testPassword))).thenReturn("encodedPassword");
-        when(jwtService.generateToken(any())).thenReturn(testToken);
+        when(passwordEncoder.encode(testPassword)).thenReturn("encodedPassword");
+
+        User expectedUser = User.builder()
+                .name("Test User")
+                .email(testEmail)
+                .password("encodedPassword")
+                .roles(new HashSet<>(Set.of(userRole)))
+                .build();
+        BlogUserDetails expectedUserDetails = new BlogUserDetails(expectedUser);
+        when(userDetailsService.loadUserByUsername(testEmail)).thenReturn(expectedUserDetails);
+
+        when(jwtService.generateToken(expectedUserDetails)).thenReturn(testToken);
         when(jwtService.getExpirationTime(testToken)).thenReturn(3600L);
 
         AuthResponse response = authenticationService.register(request);
 
         assertThat(response.getToken()).isEqualTo(testToken);
+        assertThat(response.getExpiresIn()).isEqualTo(3600L);
+
         verify(userRepository).save(argThat(user ->
                 user.getEmail().equals(testEmail) &&
                         user.getPassword().equals("encodedPassword") &&
                         user.getRoles().contains(userRole)
         ));
         verify(roleRepository, times(1)).findByName("USER");
-        verify(passwordEncoder).encode(eq(testPassword));
+        verify(passwordEncoder).encode(testPassword);
+        verify(emailService).sendWelcomeEmail(testEmail, "Test User");
     }
 
     @Test
