@@ -8,17 +8,17 @@ API REST desarrollada con Spring Boot y PostgreSQL, diseñada para gestionar pub
 - **Registro y autenticación segura**:
     - Registro con validación de datos y envío de **correo de bienvenida** (Spring Mail Starter).
     - Logueo con JWT para acceso a endpoints protegidos.
-- **Publicaciones con Borradores**:
+- **Gestión de Posts**:
     - Creación, edición y eliminación de posts en estado **BORRADOR** o **PUBLICADO**.
 - **Gestión de Roles (Spring Security)**:
     - **Usuario Estándar**: Publicar, guardar borradores y gestionar sus posts.
     - **Administrador**: Control total sobre posts, usuarios, categorías y etiquetas.
 - **Paginación**: Listado de posts públicos con paginación (usando `Pageable` de Spring Data JPA).
 - **Documentación Integrada**: Swagger UI para explorar y probar endpoints.
+- **Multi-entornos**: Configuración separada para **local**, **dev** y **prod** usando Spring Profiles.
 - **Pruebas Automatizadas**:
     - **Unitarias**: Pruebas a los controllers y services con JUnit y Mockito.
     - **Integración**: Pruebas a los repositories con `@DataJpaTest`.
-- **Despliegue Simplificado**: Configuración de PostgreSQL en Docker con un solo comando.
 
 ---
 ## 🛠 **Tecnologías**
@@ -30,6 +30,7 @@ API REST desarrollada con Spring Boot y PostgreSQL, diseñada para gestionar pub
 - **Spring Data JPA**: Paginación, queries personalizadas y repositorios.
 - **Swagger (OpenAPI 3)**: Documentación interactiva en `/swagger-ui/index.html`.
 - **Spring Boot Starter Mail**: Notificaciones por correo electrónico.
+- **Spring Profiles**: Configuración flexible para entornos `local`, `dev`, `prod`.
 - **Lombok**: Simplificación de código.
 - **JUnit 5 y Mockito**: Pruebas unitarias y de integración.
 
@@ -64,25 +65,6 @@ GET /swagger-ui/index.html  → Interfaz de Swagger.
 ```
 
 ---
-## ⚙️ **Configuración con Docker**
-
-1. Clona el repositorio y navega al directorio del proyecto.
-   ```shell
-   git clone https://github.com/FalesDev/blogApp.git
-   cd blogApp
-   ```
-2. **Levanta PostgreSQL en Docker**:
-   ```shell
-   docker-compose up -d
-   ```
-3. Ejecuta la aplicación con Maven:
-   ```shell
-   mvn spring-boot:run
-   ```
-4. Accede a la documentación interactiva:
-   http://localhost:8080/swagger-ui/index.html
-
----
 ## 🧪 Ejecución de Pruebas
 
 ```shell
@@ -93,4 +75,6 @@ mvn test
 ## 🧑‍💻 Autor
 
 Stefano Fabricio Rodriguez Avalos
+
+[LinkedIn](https://www.linkedin.com/in/stefanofabriciorodriguezavalos)
 

@@ -1,17 +1,60 @@
+version: '3.8'
+
 services:
-  # Our PostgreSQL database
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - blog-network
+
   db:
-    # Using the latest PostgreSQL image
     image: postgres:latest
     ports:
       - "5432:5432"
-    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d cyberblog"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: cyberblog
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - blog-network
 
-  # Database management interface
   adminer:
     image: adminer:latest
-    restart: always
     ports:
-      - 8888:8080
+      - "8888:8080"
+    environment: # Añade estas variables
+      ADMINER_DEFAULT_SERVER: db
+    networks:
+      - blog-network  # Asegúrate de que está en la misma red
+    depends_on:
+      - db
+
+networks:
+  blog-network:
+    name: blog-network
+
+volumes:
+  postgres_data:

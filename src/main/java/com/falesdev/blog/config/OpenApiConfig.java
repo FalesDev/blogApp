@@ -31,7 +31,7 @@ import org.springframework.http.HttpHeaders;
                 ),
                 @Server(
                         description = "PROD ENV",
-                        url = "http://cyberblog.com"
+                        url = "https://cyberblog-latest.onrender.com"
                 )
         },
         security = @SecurityRequirement(

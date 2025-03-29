@@ -6,6 +6,7 @@ import com.falesdev.blog.security.BlogUserDetailsService;
 import com.falesdev.blog.security.JwtAuthenticationFilter;
 import com.falesdev.blog.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,24 +23,48 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationService authenticationService){
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationService authenticationService) {
         return new JwtAuthenticationFilter(authenticationService);
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository){
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
         return new BlogUserDetailsService(userRepository);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "https://cyberblog-latest.onrender.com",
+                "https://cyber-blog-fawn.vercel.app",
+                "http://localhost:5173"
+        ));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http.authorizeHttpRequests(auth ->auth
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth ->auth
                     // Endpoints de Swagger
                     .requestMatchers(
                             "/swagger-ui/**",
