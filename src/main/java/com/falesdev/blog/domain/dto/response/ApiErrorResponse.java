@@ -1,4 +1,4 @@
-package com.falesdev.blog.domain.dto;
+package com.falesdev.blog.domain.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

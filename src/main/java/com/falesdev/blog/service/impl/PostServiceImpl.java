@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public PostDto getPost(UUID id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Post does not exist with ID " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Post does not exist"));
         return postMapper.toDto(post);
     }
 
@@ -77,7 +77,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public Page<PostDto> getDraftPosts(UUID userId, Pageable pageable) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return postRepository.findAllByAuthorAndStatus(
                 user,
                 PostStatus.DRAFT,
@@ -96,7 +96,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostDto createPost(UUID userId, CreatePostRequestDto createPostRequestDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Post newPost = postMapper.toCreatePost(createPostRequestDto);
 
@@ -120,7 +120,7 @@ public class PostServiceImpl implements PostService {
     @Transactional
     public PostDto updatePost(UUID id, UpdatePostRequestDto updatePostRequestDto) {
         Post existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Post does not exist with id " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Post does not exist"));
 
         postMapper.updateFromDto(updatePostRequestDto,existingPost);
         existingPost.setReadingTime(calculateReadingTime(updatePostRequestDto.getContent()));
@@ -148,7 +148,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(UUID id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Post does not exist with ID " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Post does not exist"));
         postRepository.delete(post);
     }
 

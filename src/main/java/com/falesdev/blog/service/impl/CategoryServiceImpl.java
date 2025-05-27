@@ -34,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryDto getCategoryById(UUID id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found with id" + id));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
         return categoryMapper.toDto(category);
     }
 
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto updateCategory(UUID id, UpdateCategoryRequestDto updateCategoryRequestDto) {
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("Category does not exist with id "+id));
+                .orElseThrow(()-> new EntityNotFoundException("Category does not exist"));
 
         categoryMapper.updateFromDto(updateCategoryRequestDto,existingCategory);
         Category updatedCategory = categoryRepository.save(existingCategory);
@@ -66,7 +66,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategory(UUID id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
 
         if (!category.getPosts().isEmpty()) {
             throw new IllegalStateException("Category has posts associated with it");

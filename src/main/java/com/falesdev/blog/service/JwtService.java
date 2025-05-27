@@ -7,8 +7,11 @@ import java.security.Key;
 
 public interface JwtService {
 
-    String generateToken(UserDetails userDetails);
     Claims parseClaims(String token);
     long getExpirationTime(String token);
     Key getSigningKey();
+    String generateAccessToken(UserDetails userDetails);
+    String generateRefreshToken(UserDetails userDetails);
+    long getJwtExpirationMs();
+    long getRefreshExpirationMs();
 }

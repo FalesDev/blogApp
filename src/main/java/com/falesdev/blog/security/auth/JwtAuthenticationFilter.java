@@ -1,5 +1,6 @@
-package com.falesdev.blog.security;
+package com.falesdev.blog.security.auth;
 
+import com.falesdev.blog.security.BlogUserDetails;
 import com.falesdev.blog.service.AuthenticationService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                if(userDetails instanceof  BlogUserDetails){
+                if(userDetails instanceof BlogUserDetails){
                     request.setAttribute("userId",((BlogUserDetails) userDetails).getId());
                 }
             }

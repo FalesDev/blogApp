@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @DataJpaTest
 public class UserRepositoryIntegrationTest {
 
@@ -36,7 +38,8 @@ public class UserRepositoryIntegrationTest {
         user = User.builder()
                 .email("fabricio@example.com")
                 .password("securepass")
-                .name("Fabricio Rodriguez")
+                .firstName("Fabricio")
+                .lastName("Rodriguez")
                 .roles(new HashSet<>(Set.of(role)))
                 .build();
         entityManager.persistAndFlush(user);
@@ -52,7 +55,8 @@ public class UserRepositoryIntegrationTest {
         User user = User.builder()
                 .email("fabricio-1998-xd@hotmail.com")
                 .password("securepass")
-                .name("Fabricio Rodriguez")
+                .firstName("Fabricio")
+                .lastName("Rodriguez")
                 .roles(new HashSet<>(Set.of(role)))
                 .build();
 
@@ -60,7 +64,8 @@ public class UserRepositoryIntegrationTest {
 
         assertThat(savedUser.getId()).isNotNull();
         assertThat(savedUser.getEmail()).isEqualTo("fabricio-1998-xd@hotmail.com");
-        assertThat(savedUser.getName()).isEqualTo("Fabricio Rodriguez");
+        assertThat(savedUser.getFirstName()).isEqualTo("Fabricio");
+        assertThat(savedUser.getLastName()).isEqualTo("Rodriguez");
         assertThat(savedUser.getRoles()).hasSize(1);
     }
 
@@ -70,7 +75,8 @@ public class UserRepositoryIntegrationTest {
 
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getEmail()).isEqualTo("fabricio@example.com");
-        assertThat(foundUser.get().getName()).isEqualTo("Fabricio Rodriguez");
+        assertThat(foundUser.get().getFirstName()).isEqualTo("Fabricio");
+        assertThat(foundUser.get().getLastName()).isEqualTo("Rodriguez");
     }
 
     @Test

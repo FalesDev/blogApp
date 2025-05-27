@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDto getUserById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         return userMapper.toDto(user);
     }
 
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(CreateUserRequestDto userRequestDto) {
         if (userRepository.existsByEmailIgnoreCase(userRequestDto.getEmail())){
-            throw new IllegalArgumentException("User already exists with email: " + userRequestDto.getName());
+            throw new IllegalArgumentException("User already exists");
         }
 
         User newUser = userMapper.toCreateUser(userRequestDto);
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("User does not exist with id "+id));
+                .orElseThrow(()-> new EntityNotFoundException("User does not exist"));
         userMapper.updateFromDto(updateUserRequestDto, existingUser);
 
         if (updateUserRequestDto.getRoleIds() != null && !updateUserRequestDto.getRoleIds().isEmpty()) {
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("User does not exist with ID "+id));
+                .orElseThrow(()-> new EntityNotFoundException("User does not exist"));
         userRepository.delete(user);
     }
 }

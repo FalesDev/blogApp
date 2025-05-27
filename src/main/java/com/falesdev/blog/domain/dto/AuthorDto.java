@@ -14,5 +14,6 @@ import java.util.UUID;
 public class AuthorDto {
 
     private UUID id;
-    private String name;
+    private String firstName;
+    private String lastName;
 }

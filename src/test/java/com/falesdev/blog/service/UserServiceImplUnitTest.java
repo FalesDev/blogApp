@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.*;
 
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplUnitTest {
 
@@ -54,7 +56,8 @@ public class UserServiceImplUnitTest {
     void setUp() {
         user = User.builder()
                 .id(userId)
-                .name("Fabricio Rodriguez")
+                .firstName("Fabricio")
+                .lastName("Rodriguez")
                 .email("fabricio-1998-xd@hotmail.com")
                 .password("encodedPassword")
                 .roles(new HashSet<>())
@@ -62,19 +65,22 @@ public class UserServiceImplUnitTest {
 
         userDto = UserDto.builder()
                 .id(userId)
-                .name("Fabricio Rodriguez")
+                .firstName("Fabricio")
+                .lastName("Rodriguez")
                 .email("fabricio-1998-xd@hotmail.com")
                 .build();
 
         createRequest = CreateUserRequestDto.builder()
-                .name("Fabricio Rodriguez")
+                .firstName("Fabricio")
+                .lastName("Rodriguez")
                 .email("fabricio-1998-xd@hotmail.com")
                 .password("password")
                 .roleIds(Set.of(UUID.randomUUID()))
                 .build();
 
         updateRequest = UpdateUserRequestDto.builder()
-                .name("Fabricio Updated")
+                .firstName("Fabricio")
+                .lastName("Updated")
                 .password("newPassword")
                 .roleIds(Set.of(UUID.randomUUID()))
                 .build();
@@ -174,7 +180,7 @@ public class UserServiceImplUnitTest {
         assertThat(user.getPassword()).isEqualTo("encodedNewPassword");
         assertThat(user.getRoles()).isEqualTo(newRoles);
         verify(userMapper).updateFromDto(
-                argThat(dto -> dto.getName().equals("Fabricio Updated")),
+                argThat(dto -> dto.getLastName().equals("Updated")),
                 eq(user)
         );
         verify(userRepository).save(eq(user));

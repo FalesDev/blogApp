@@ -1,5 +1,6 @@
 package com.falesdev.blog.config;
 
+import com.falesdev.blog.domain.RegisterType;
 import com.falesdev.blog.domain.entity.Role;
 import com.falesdev.blog.domain.entity.User;
 import com.falesdev.blog.repository.RoleRepository;
@@ -34,8 +35,16 @@ public class DataInitializer {
             Set<Role> userRoles = new HashSet<>();
             userRoles.add(createRoleIfNotFound("USER"));
 
-            createUserIfNotFound("admin@test.com", "Admin User", "adminpassword", adminRoles);
-            createUserIfNotFound("user@test.com", "Test User", "password", userRoles);
+            createUserIfNotFound(
+                    "admin@test.com",
+                    "Admin User",
+                    "adminpassword",
+                    adminRoles);
+            createUserIfNotFound(
+                    "user@test.com",
+                    "Test User",
+                    "password",
+                    userRoles);
         };
     }
 
@@ -51,16 +60,18 @@ public class DataInitializer {
                 });
     }
 
-    private void createUserIfNotFound(String email, String name,
+    private void createUserIfNotFound(String email, String firstName,
                                       String rawPassword, Set<Role> roles) {
         userRepository.findByEmail(email).orElseGet(() -> {
             log.info("Creating user: {}", email);
             return userRepository.save(
                     User.builder()
                             .email(email)
-                            .name(name)
+                            .firstName(firstName)
+                            .lastName("Cyber")
                             .password(passwordEncoder.encode(rawPassword))
                             .roles(new HashSet<>(roles))
+                            .registerType(RegisterType.LOCAL)
                             .build()
             );
         });

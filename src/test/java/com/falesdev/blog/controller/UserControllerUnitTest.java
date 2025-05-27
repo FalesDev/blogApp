@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class UserControllerUnitTest {
 
@@ -47,20 +49,22 @@ public class UserControllerUnitTest {
         // DTO to list/get
         userDto = createUserDto(
                 "fabricio-1998-xd@hotmail.com",
-                "Fabricio Rodriguez",
+                "Fabricio",
+                "Rodriguez",
                 Set.of(role)
         );
 
         // DTOs for the creation test
         createUserRequestDto = CreateUserRequestDto.builder()
                 .email("renato-1998-xd@hotmail.com")
-                .name("securepass")
-                .name("Renato Quiñones")
+                .firstName("Renato")
+                .lastName("Quiñones")
                 .roleIds(Set.of(role.getId()))
                 .build();
         expectedCreatedUserDto = createUserDto(
                 "renato-1998-xd@hotmail.com",
-                "Renato Quiñones",
+                "Renato",
+                "Quiñones",
                 Set.of(role)
         );
 
@@ -68,13 +72,14 @@ public class UserControllerUnitTest {
         updateUserRequestDto = UpdateUserRequestDto.builder()
                 .id(UUID.randomUUID())
                 .email("mario-1998-xd@hotmail.com")
-                .name("securepass")
-                .name("Mario Gutierrez")
+                .firstName("Mario")
+                .lastName("Gutierrez")
                 .roleIds(Set.of(role.getId()))
                 .build();
         expectedUpdatedUserDto = createUserDto(
                 "mario-1998-xd@hotmail.com",
-                "Mario Gutierrez",
+                "Mario",
+                "Gutierrez",
                 Set.of(role)
         );
     }
@@ -166,13 +171,14 @@ public class UserControllerUnitTest {
         verify(userService, times(1)).deleteUser(eq(userId));
     }
 
-    private UserDto createUserDto(String email, String name,
+    private UserDto createUserDto(String email, String firstName, String lastName,
                                   Set<RoleDto> roles) {
         return UserDto.builder()
                 .id(UUID.randomUUID())
                 .email(email)
                 .password("securepass")
-                .name(name)
+                .firstName(firstName)
+                .lastName(lastName)
                 .roles(roles)
                 .createdAt(LocalDateTime.now())
                 .build();

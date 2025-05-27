@@ -17,6 +17,8 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
+    //Funciona bien el mailSender, warning es por el IntelliJ.
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 

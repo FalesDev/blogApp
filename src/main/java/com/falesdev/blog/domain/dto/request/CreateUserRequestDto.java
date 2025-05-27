@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CreateUserRequestDto {
 
-    @Email
+    @Email(message = "Email should be valid")
     @NotBlank(message = "Email is required")
     private String email;
 
@@ -27,10 +28,16 @@ public class CreateUserRequestDto {
     @NotBlank(message = "Password is required")
     private String password;
 
-    @NotBlank(message = "Name is required")
-    private String name;
+    @NotBlank(message = "FirstName is required")
+    private String firstName;
+
+    @NotBlank(message = "LastName is required")
+    private String lastName;
 
     @Builder.Default
     @NotEmpty(message = "At least one role is required")
     private Set<UUID> roleIds = new HashSet<>();
+
+    @URL(protocol = "https", message = "Must be a valid HTTPS URL")
+    private String imageURL;
 }

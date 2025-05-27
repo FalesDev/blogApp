@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class PostControllerUnitTest {
 
@@ -46,7 +48,11 @@ public class PostControllerUnitTest {
     @BeforeEach
     public void setUp() {
         // Initialize unique IDs and variables
-        AuthorDto author = AuthorDto.builder().id(UUID.randomUUID()).name("Test Author").build();
+        AuthorDto author = AuthorDto.builder()
+                .id(UUID.randomUUID())
+                .firstName("Test Author")
+                .lastName("Cyber")
+                .build();
         CategoryDto category = CategoryDto.builder().id(UUID.randomUUID()).name("Test Category").postCount(2).build();
         TagDto tag = TagDto.builder().id(UUID.randomUUID()).name("Test Tag").postCount(5).build();
 

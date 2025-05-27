@@ -1,5 +1,6 @@
 package com.falesdev.blog.domain.dto;
 
+import com.falesdev.blog.domain.RegisterType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,11 @@ public class UserDto {
     private UUID id;
     private String email;
     private String password;
-    private String name;
+    private String firstName;
+    private String lastName;
     private Set<RoleDto> roles;
+    private String imageURL;
+    private RegisterType registerType;
     private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
 }

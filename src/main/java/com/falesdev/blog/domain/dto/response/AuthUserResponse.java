@@ -1,5 +1,6 @@
-package com.falesdev.blog.domain.dto;
+package com.falesdev.blog.domain.dto.response;
 
+import com.falesdev.blog.domain.dto.RoleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +13,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AuthUser {
+public class AuthUserResponse {
 
     private UUID id;
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
     private Set<RoleDto> roles;
+    private String imageURL;
 }

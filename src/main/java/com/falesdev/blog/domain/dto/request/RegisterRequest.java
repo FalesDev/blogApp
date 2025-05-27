@@ -12,10 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SignupRequest {
+public class RegisterRequest {
 
-    @NotBlank(message = "Name is required")
-    private String name;
+    @NotBlank(message = "FirstName is required")
+    private String firstName;
+
+    @NotBlank(message = "LastName is required")
+    private String lastName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")

@@ -1,12 +1,11 @@
 package com.falesdev.blog.config;
 
-import com.falesdev.blog.domain.dto.ApiErrorResponse;
+import com.falesdev.blog.domain.dto.response.ApiErrorResponse;
 import com.falesdev.blog.repository.UserRepository;
-import com.falesdev.blog.security.BlogUserDetailsService;
-import com.falesdev.blog.security.JwtAuthenticationFilter;
+import com.falesdev.blog.security.service.BlogUserDetailsService;
+import com.falesdev.blog.security.auth.JwtAuthenticationFilter;
 import com.falesdev.blog.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,7 +45,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "https://cyberblog-latest.onrender.com",
+                "https://cyberblog-u6ejz.ondigitalocean.app",
                 "https://cyber-blog-fawn.vercel.app",
                 "http://localhost:5173"
         ));
@@ -76,8 +75,12 @@ public class SecurityConfig {
                     ).permitAll()
 
                     // Endpoints de autenticación
-                    .requestMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll()
+                    .requestMatchers(HttpMethod.POST,
+                            "/api/v1/auth/login",
+                            "/api/v1/auth/register",
+                            "/api/v1/auth/google",
+                            "/api/v1/auth/refresh"
+                    ).permitAll()
                     .requestMatchers(HttpMethod.GET,"/api/v1/auth/me").authenticated()
 
                     // Endpoints de posts,categories,tags,roles,users

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @DataJpaTest
 public class PostRepositoryIntegrationTest {
 
@@ -39,7 +41,8 @@ public class PostRepositoryIntegrationTest {
         author = User.builder()
                 .email("fabricio@example.com")
                 .password("securepass")
-                .name("Fabricio Rodriguez Avalos")
+                .firstName("Rodriguez Avalos")
+                .lastName("Rodriguez Avalos")
                 .roles(new HashSet<>(Set.of(role)))
                 .build();
         entityManager.persistAndFlush(author);
@@ -98,7 +101,8 @@ public class PostRepositoryIntegrationTest {
         User author = User.builder()
                 .email("fabricio-1998-xd@hotmail.com")
                 .password("securepass")
-                .name("Fabricio Rodriguez")
+                .firstName("Fabricio")
+                .lastName("Rodriguez")
                 .roles(new HashSet<>(Set.of(role)))
                 .build();
         entityManager.persistAndFlush(author);

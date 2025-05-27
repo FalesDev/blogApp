@@ -1,9 +1,10 @@
 package com.falesdev.blog.controller;
 
-import com.falesdev.blog.domain.dto.AuthResponse;
-import com.falesdev.blog.domain.dto.AuthUser;
+import com.falesdev.blog.domain.dto.response.AuthResponse;
+import com.falesdev.blog.domain.dto.response.AuthUserResponse;
 import com.falesdev.blog.domain.dto.request.LoginRequest;
-import com.falesdev.blog.domain.dto.request.SignupRequest;
+import com.falesdev.blog.domain.dto.request.RegisterRequest;
+import com.falesdev.blog.security.BlogUserDetails;
 import com.falesdev.blog.service.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,12 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerUnitTest {
 
@@ -31,24 +33,26 @@ public class AuthControllerUnitTest {
     private AuthController authController;
 
     private LoginRequest loginRequest;
-    private SignupRequest signupRequest;
+    private RegisterRequest registerRequest;
     private AuthResponse expectedResponse;
-    private AuthUser expectedUser;
-    private Authentication authentication;
+    private AuthUserResponse expectedUser;
+    private BlogUserDetails blogUserDetails;
 
     @BeforeEach
     public void init() {
         loginRequest = LoginRequest.builder().email("test@example.com").password("password").build();
         expectedResponse = AuthResponse.builder()
-                .token("jwt.token.here")
+                .accessToken("jwt.token.here")
                 .build();
-        authentication = mock(Authentication.class);
-        expectedUser = AuthUser.builder()
+        blogUserDetails = mock(BlogUserDetails.class);
+        expectedUser = AuthUserResponse.builder()
                 .email("user@example.com")
-                .name("Test User")
+                .firstName("Test User")
+                .lastName("Cyber")
                 .build();
-        signupRequest = SignupRequest.builder()
-                .name("Test User")
+        registerRequest = RegisterRequest.builder()
+                .firstName("Test User")
+                .lastName("Cyber")
                 .email("test@example.com")
                 .password("password")
                 .build();
@@ -73,27 +77,27 @@ public class AuthControllerUnitTest {
     @Test
     @DisplayName("Get authenticated user profile - Returns AuthUser")
     void getUserProfile_ValidAuthentication_ReturnsAuthUser() {
-        when(authenticationService.getUserProfile(eq(authentication))).thenReturn(expectedUser);
+        when(authenticationService.getUserProfile(eq(blogUserDetails))).thenReturn(expectedUser);
 
-        ResponseEntity<AuthUser> response = authController.getUserProfile(authentication);
+        ResponseEntity<AuthUserResponse> response = authController.getUserProfile(blogUserDetails);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(expectedUser);
 
-        verify(authenticationService).getUserProfile(eq(authentication));
+        verify(authenticationService).getUserProfile(eq(blogUserDetails));
     }
 
     @Test
     @DisplayName("Registration successful - Returns AuthResponse")
     void signup_ValidRequest_ReturnsAuthResponse() {
-        when(authenticationService.register(eq(signupRequest))).thenReturn(expectedResponse);
+        when(authenticationService.register(eq(registerRequest))).thenReturn(expectedResponse);
 
-        ResponseEntity<AuthResponse> response = authController.signup(signupRequest);
+        ResponseEntity<AuthResponse> response = authController.register(registerRequest);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
 
-        verify(authenticationService).register(eq(signupRequest));
+        verify(authenticationService).register(eq(registerRequest));
     }
 
     @Test

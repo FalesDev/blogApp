@@ -1,7 +1,8 @@
-package com.falesdev.blog.security;
+package com.falesdev.blog.security.service;
 
 import com.falesdev.blog.domain.entity.User;
 import com.falesdev.blog.repository.UserRepository;
+import com.falesdev.blog.security.BlogUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
